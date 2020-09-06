@@ -1,9 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from . import models
+from rooms import models as room_models
 
 
 # Register your models here.
+class RoomInline(admin.StackedInline):
+    model = room_models.Room
+
+
 @admin.register(models.User)
 class CustomUserAdmin(UserAdmin):
 
@@ -25,6 +30,10 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
+
+    inlines = [
+        RoomInline,
+    ]
 
     list_display = (
         "username",
