@@ -4,7 +4,7 @@ from rooms.models import Facility
 
 class Command(BaseCommand):
 
-    help = "This command creates a list of facilities"
+    help = "This command creates facilities"
 
     # def add_arguments(self, parser):
     #     parser.add_argument(
