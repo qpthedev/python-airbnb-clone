@@ -7,13 +7,13 @@ from . import models
 def all_rooms(request):
     page = request.GET.get("page")
     room_list = models.Room.objects.all()
-    paginator = Paginator(room_list, 10)
+    paginator = Paginator(room_list, 10, orphans=5)
     rooms = paginator.get_page(page)
 
     return render(
         request,
         "rooms/home.html",
         context={
-            "rooms": rooms,
+            "page": rooms,
         },
     )
