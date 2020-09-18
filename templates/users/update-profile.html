@@ -1,0 +1,18 @@
+{% extends "base.html" %} 
+
+{% block page_name %} 
+    Update Profile 
+{% endblock page_name %}
+
+{%block content %} 
+    <form method="POST" action="{% url "users:update" %}">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button>Update</button>
+    </form>
+    
+    <!-- {% if object.login_method == "password" %} -->
+    <!-- {% endif %} -->
+    <a href="{% url "users:password" %}">Change Password</a>
+    
+{% endblock content %}

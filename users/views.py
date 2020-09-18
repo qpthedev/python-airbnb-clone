@@ -1,8 +1,9 @@
-from django.views.generic import FormView
+from django.views.generic import FormView, DetailView, UpdateView
+from django.contrib.auth.views import PasswordChangeView
 from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate, login, logout
-from . import forms
+from . import forms, models
 
 
 # Create your views here.
@@ -43,3 +44,36 @@ class SignUpView(FormView):
         if user is not None:
             login(self.request, user)
         return super().form_valid(form)
+
+
+class UserProfileView(DetailView):
+    model = models.User
+    context_object_name = "user_obj"
+
+
+class UpdateProfileView(UpdateView):
+    model = models.User
+    template_name = "users/update-profile.html"
+    fields = (
+        "email",
+        "first_name",
+        "last_name",
+        "gender",
+        "bio",
+        "birthdate",
+        "language",
+        "currency",
+    )
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        email = form.cleaned_data.get("email")
+        self.object.username = email
+        self.object.save()
+        return super().form_valid(form)
+
+
+class UpdatePasswordView(PasswordChangeView):
+    template_name = "users/update-password.html"

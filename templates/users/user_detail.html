@@ -1,0 +1,29 @@
+{% extends "base.html" %} 
+
+{% block page_name %} 
+    {{user_obj.first_name}}'s Profile
+{% endblock page_name %}
+
+{%block content %}
+    {% if user_obj.avatar %}
+        <img src="{{user_obj.avatar.url}}" />
+    {% else %}
+        <div>
+            <span>{{user_obj.first_name|first}}</span>
+        </div>
+    {% endif %}
+
+    {{user_obj.first_name}}
+
+    {% if user == user_obj %}
+        <a href="{% url "users:update" %}">Edit Profile</a>
+    {% endif %}
+    
+    
+    {% if user_obj.rooms.all.count > 0 %}
+        <div>
+            <h3>{{user_obj.first_name}}'s Room</h3>
+        </div>
+    {% endif %}
+        
+{% endblock content %}
