@@ -4,6 +4,9 @@
         
         {% if user.is_authenticated %}
             <li>
+                <a href="{% url "lists:see-favs" %}">Favorites</a>
+            </li>
+            <li>
                 <a href="{{user.get_absolute_url}}">Profile</a>
             </li>
             <li>

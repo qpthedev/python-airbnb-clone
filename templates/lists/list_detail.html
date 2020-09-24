@@ -1,0 +1,21 @@
+{% extends "base.html" %} 
+
+{% block page_name %} 
+    {{user_obj.first_name}}'s Favorites
+{% endblock page_name %}
+
+{%block content %}
+
+    <div>Your Favorites</div>
+    
+    
+    {% for room in user.list.rooms.all %}
+        <div>
+            {{room.name}}
+        </div>
+    {% endfor %}
+        
+        
+
+        
+{% endblock content %}

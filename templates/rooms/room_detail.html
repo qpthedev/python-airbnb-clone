@@ -1,4 +1,5 @@
 {% extends "base.html" %} 
+{% load on_favs %}
 
 {% block page_name %} 
     ROOM DETAIL 
@@ -34,6 +35,15 @@
                 <li>{{r}}</li>
             {% endfor %}
         </ul>
+    </div>
+    <div>
+        {% on_favs room as on_favs_boolean %}
+        {% if on_favs_boolean %}
+            <a href="{% url "lists:toggle-room" room.pk %}?action=remove">Remove from Favorites</a>
+        {% else %}
+            <a href="{% url "lists:toggle-room" room.pk %}?action=add">Save to Favorites</a>
+        {% endif %}
+            
     </div>
 
    
