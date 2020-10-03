@@ -4,6 +4,11 @@
     Log In 
 {% endblock page_title %}
 
+
+{% block search-bar %}
+{% endblock search-bar %}
+    
+
 {%block content %} 
     <form method="POST" action="{% url "users:login" %}">
         {% csrf_token %}
