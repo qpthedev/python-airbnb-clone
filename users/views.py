@@ -1,3 +1,4 @@
+from django.http import request
 from django.views.generic import FormView, DetailView, UpdateView
 from django.contrib.auth.views import PasswordChangeView
 from django.shortcuts import redirect, reverse
@@ -96,3 +97,16 @@ class UpdatePasswordView(
 
     def get_success_url(self):
         return self.request.user.get_absolute_url()
+
+
+def complete_verification(request, key):
+    try:
+        user = models.User.objects.get(email_secret=key)
+        user.email_verified = True
+        user.email_secret = ""
+        user.save()
+        # TODO: Add success message
+    except models.User.DoesNotExist:
+        # TODO: Add error message
+        pass
+    return redirect(reverse("core:home"))
