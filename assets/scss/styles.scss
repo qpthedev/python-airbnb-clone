@@ -15,4 +15,8 @@
   }
 }
 
+.btn {
+  @apply text-center rounded-sm py-5 font-light text-lg w-full;
+}
+
 @tailwind utilities;

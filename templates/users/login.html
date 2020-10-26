@@ -9,13 +9,13 @@
 {% endblock search-bar %}
     
 
-{%block content %} 
+{% block content %} 
     <div class="container mx-auto my-10 flex flex-col items-center border p-6 border-gray-400 md:w-1/2 lg:w-5/12 xl:w-1/4">
         {% include 'partials/social_login.html' %}
-        <form method="POST" action="{% url "users:login" %}">
+        <form method="POST" action="{% url "users:login" %}" class="w-full">
             {% csrf_token %}
             {{form.as_p}}
-            <button>Login</button>
+            <button class="btn bg-red-500 text-white">Login</button>
         </form>
     </div>
 {% endblock content %}
