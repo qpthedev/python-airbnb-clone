@@ -1,7 +1,4 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.db.models import fields
-from django.forms import widgets
 from . import models
 
 
@@ -27,7 +24,7 @@ class LoginForm(forms.Form):
             self.add_error("email", forms.ValidationError("User does not exist"))
 
 
-class SignUpForm(UserCreationForm):
+class SignUpForm(forms.ModelForm):
     class Meta:
         model = models.User
         fields = ("first_name", "last_name", "email")
@@ -44,9 +41,20 @@ class SignUpForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={"placeholder": "Confirm Password"})
     )
 
-    def clean_password(self):
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        try:
+            models.User.objects.get(email=email)
+            raise forms.ValidationError(
+                "That email is already taken.", code="existing_user"
+            )
+        except models.User.DoesNotExist:
+            return email
+
+    def clean_password1(self):
         password = self.cleaned_data.get("password")
         password1 = self.cleaned_data.get("password1")
+        print(password, password1)
 
         if password != password1:
             raise forms.ValidationError("Passwords do not match. Please try again.")
