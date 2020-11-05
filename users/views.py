@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.base import ContentFile
+from django.contrib import messages
 from . import forms, models, mixins
 
 
@@ -40,6 +41,7 @@ class LoginView(mixins.LoggedOutOnlyView, FormView):
 
 
 def log_out(request):
+    messages.info(request, "Logged Out")
     logout(request)
     return redirect(reverse("core:home"))
 
@@ -139,7 +141,9 @@ def github_callback(request):
             token_json = token_request.json()
             error = token_json.get("error", None)
             if error is not None:
-                raise GithubException()
+                raise GithubException(
+                    "Could not get Github access token. Please try again."
+                )
             else:
                 access_token = token_json.get("access_token")
                 profile_request = requests.get(
@@ -158,7 +162,9 @@ def github_callback(request):
                     try:
                         user = models.User.objects.get(email=email)
                         if user.login_method != models.User.LOGIN_GITHUB:
-                            raise GithubException()
+                            raise GithubException(
+                                f"Please log in with {user.login_method}"
+                            )
                     except models.User.DoesNotExist:
                         user = models.User.objects.create(
                             email=email,
@@ -171,13 +177,14 @@ def github_callback(request):
                         user.set_unusable_password()
                         user.save()
                     login(request, user)
+                    messages.success(request, f"Welcome {user.first_name}")
                     return redirect(reverse("core:home"))
                 else:
-                    raise GithubException()
+                    raise GithubException("Could not get Github profile.")
         else:
-            raise GithubException()
-    except GithubException:
-        # TODO: send error message
+            raise GithubException("Could not get Github code. Please try again.")
+    except GithubException as e:
+        messages.error(request, e)
         return redirect(reverse("users/login"))
 
 
@@ -204,7 +211,7 @@ def kakao_callback(request):
         token_json = token_request.json()
         error = token_json.get("error", None)
         if error is not None:
-            raise KakaoException()
+            raise KakaoException("Could not get Kakao authorization code.")
 
         access_token = token_json.get("access_token")
         profile_request = requests.get(
@@ -215,7 +222,7 @@ def kakao_callback(request):
         profile_json = profile_request.json()
         email = profile_json.get("kakao_account").get("email", None)
         if email is None:
-            raise KakaoException()
+            raise KakaoException("Could not get Kakao email. Please check permissions.")
         profile = profile_json.get("kakao_account").get("profile")
         nickname = profile.get("nickname")
         profile_image = profile.get("profile_image_url", None)
@@ -223,7 +230,7 @@ def kakao_callback(request):
         try:
             user = models.User.objects.get(email=email)
             if user.login_method != models.User.LOGIN_KAKAO:
-                raise KakaoException()
+                raise KakaoException(f"Please log in with {user.login_method}")
         except models.User.DoesNotExist:
             user = models.User.objects.create(
                 email=email,
@@ -240,6 +247,8 @@ def kakao_callback(request):
                     f"{nickname}-avatar", ContentFile(photo_request.content)
                 )
         login(request, user)
+        messages.success(request, f"Welcome {user.first_name}")
         return redirect(reverse("core:home"))
-    except KakaoException:
+    except KakaoException as e:
+        messages.error(request, e)
         return redirect(reverse("users:login"))
